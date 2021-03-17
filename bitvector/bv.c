@@ -3,16 +3,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BV_BITS (sizeof(BV_TYPE) * 8)
+
 typedef struct BitVector {
     uint32_t length;
-    uint8_t *vector;
+    BV_TYPE *vector;
 } BitVector;
 
 BitVector *bv_create(uint32_t length) {
     // creates an empty vector size of length
     BitVector *v = (BitVector *) calloc(1, sizeof(BitVector));
     v->length = length;
-    v->vector = calloc(length / 8, sizeof(uint8_t));
+    v->vector = calloc(length / BV_BITS, sizeof(BV_TYPE));
     if (v->vector == NULL) {
         free(v);
         return NULL;
@@ -34,19 +36,19 @@ uint32_t bv_length(BitVector *bv) {
 
 void bv_set_bit(BitVector *bv, uint32_t i) {
     // ORs specified bit with 1
-    bv->vector[i / 8] |= 1 << (i % 8);
+    bv->vector[i / BV_BITS] |= 1 << (i % BV_BITS);
     return;
 }
 
 void bv_clr_bit(BitVector *bv, uint32_t i) {
     // ANDs everything with 1 except specified bit
-    bv->vector[i / 8] &= ~(1 << (i % 8));
+    bv->vector[i / BV_BITS] &= ~(1 << (i % BV_BITS));
     return;
 }
 
-uint8_t bv_get_bit(BitVector *bv, uint32_t i) {
+BV_TYPE bv_get_bit(BitVector *bv, uint32_t i) {
     // ANDs the specified bit with 1 and returns that
-    return (bv->vector[i / 8] >> i % 8) & 1;
+    return (bv->vector[i / BV_BITS] >> i % BV_BITS) & 1;
 }
 
 void bv_print(BitVector *bv) {
